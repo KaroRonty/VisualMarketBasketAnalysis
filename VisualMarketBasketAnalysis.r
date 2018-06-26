@@ -45,7 +45,7 @@ hist(rules_df$lift, breaks = 100)
 hist(rules_df$count, breaks = 100
 
 # Plot the quality criteria as an interactive plot
-plot(rules, measure=c("confidence","lift"), engine = "interactive".
+plot(rules, measure=c("confidence","lift"), engine = "interactive",
 shading="support",control=list(col=brewer.pal(11,"Spectral")))
 
 # Plot some rules
