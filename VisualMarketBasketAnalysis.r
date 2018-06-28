@@ -57,7 +57,7 @@ library(readxl)
 library(dplyr)
 library(stringr)
 library(arulesSequences)
-options(scipen = 1000000000)
+options(scipen = 1e+09)
 
 # Load the sales data, download manually if the file becomes corrupted during download
 url <- "http://archive.ics.uci.edu/ml/machine-learning-databases/00352/Online%20Retail.xlsx"
