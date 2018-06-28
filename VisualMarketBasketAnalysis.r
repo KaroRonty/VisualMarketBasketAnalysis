@@ -98,5 +98,5 @@ sequences <- cspade(basket, parameter = list(support = 0.035), control = list(ve
 sequences <- sequences %>% 
     .[size(., "itemsets") > 1] %>% 
     as("data.frame") %>% 
-    arrange(desc(support)) %>% 
-    View()
+    arrange(desc(support))
+View(sequences)
