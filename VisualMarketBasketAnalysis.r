@@ -77,7 +77,7 @@ sales <- as.data.frame(sales)
 colnames(sales) <- c("sequenceID", "eventID", "items", "SIZE")
 
 # cSPADE needs data to be sorted by sequenceID and eventID
-sales <- sales[order(sales$sequenceID,sales$eventID), ]
+sales <- sales[order(sales$sequenceID, sales$eventID), ]
 
 # Convert dates to numeric to avoid spaces
 sales$eventID <- as.numeric(sales$eventID)
