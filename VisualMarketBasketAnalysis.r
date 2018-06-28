@@ -1,3 +1,4 @@
+# Apriori algorithm
 library(data.table)
 library(dplyr)
 library(arules)
@@ -49,3 +50,53 @@ plot(rules, measure = c("confidence", "lift"), engine = "interactive", shading =
 # Plot some rules
 rules_top <- head(rules, 25)
 plot(rules_top, method = "graph", control = list(type = "items"))
+
+# -------------------------------------------------------------------------------------
+# arulesSequences using cSPADE algorithm, four inputs: sequenceID, eventID, items, SIZE
+library(readxl)
+library(dplyr)
+library(stringr)
+library(arulesSequences)
+options(scipen = 1000000000)
+
+# Load the sales data, download manually if the file becomes corrupted during download
+url <- "http://archive.ics.uci.edu/ml/machine-learning-databases/00352/Online%20Retail.xlsx"
+download.file(url, destfile = "sales.xlsx")
+sales <- read_xlsx("sales.xlsx", sheet = 1)
+
+# Add items together by invoice
+sales <- sales %>% 
+    group_by(CustomerID, InvoiceDate) %>% 
+   summarise(items = paste(StockCode, collapse = " "))
+
+# Count the number of items on each receipt
+sales$SIZE <- str_count(sales$items, " ") + 1
+sales <- as.data.frame(sales)
+
+# CustomerID = sequenceID, invoiceDate = eventID
+colnames(sales) <- c("sequenceID", "eventID", "items", "SIZE")
+
+# cSPADE needs data to be sorted by sequenceID and eventID
+sales <- sales[order(sales$sequenceID,sales$eventID), ]
+
+# Convert dates to numeric to avoid spaces
+sales$eventID <- as.numeric(sales$eventID)
+sales$sequenceID <- as.numeric(sales$sequenceID)
+
+# Rearrange columns and rows, remove transactions that are too large for cSPADE
+sales_ <- sales %>% 
+    select(sequenceID, eventID, SIZE, items) %>%
+	arrange(sequenceID, eventID) %>%
+	filter(SIZE < 1000)
+
+# Mine transactions
+write.table(sales_, "basket.txt", quote = F, row.names = F, col.names = F)
+basket <- read_baskets("basket.txt", info = c("sequenceID", "eventID", "SIZE"))
+sequences <- cspade(basket, parameter = list(support = 0.035), control = list(verbose = TRUE))
+
+# Remove sequences containing single items, format into data frame, sort and view
+sequences <- sequences %>% 
+    .[size(., "itemsets") > 1] %>% 
+    as("data.frame") %>% 
+    arrange(desc(support)) %>% 
+    View()
