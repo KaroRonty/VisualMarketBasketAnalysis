@@ -84,13 +84,13 @@ sales$eventID <- as.numeric(sales$eventID)
 sales$sequenceID <- as.numeric(sales$sequenceID)
 
 # Rearrange columns and rows, remove transactions that are too large for cSPADE
-sales_ <- sales %>% 
+sales <- sales %>% 
     select(sequenceID, eventID, SIZE, items) %>%
 	arrange(sequenceID, eventID) %>%
 	filter(SIZE < 1000)
 
 # Mine transactions
-write.table(sales_, "basket.txt", quote = F, row.names = F, col.names = F)
+write.table(sales, "basket.txt", quote = F, row.names = F, col.names = F)
 basket <- read_baskets("basket.txt", info = c("sequenceID", "eventID", "SIZE"))
 sequences <- cspade(basket, parameter = list(support = 0.035), control = list(verbose = TRUE))
 
