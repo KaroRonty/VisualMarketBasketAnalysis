@@ -21,7 +21,7 @@ sales_apriori <- sales_apriori[, 1:2]
 products <- products[, 1:2]
 sales_apriori <- left_join(sales_apriori, products, by = "product_id")
 
-# For baskets from items bought together and format them into transactions and rules
+# Form baskets from items bought together and format them into transactions and rules
 baskets <- sales_apriori %>% group_by(order_id) %>% summarise(items = list(product_name))
 transactions <- as(baskets$items, "transactions")
 # Confidence: odds of A being bought after B was bought Adjust higher if too many rules were found
